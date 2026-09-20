@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../game/domain/entities/game.dart';
@@ -304,6 +306,73 @@ class _SettingsBody extends ConsumerWidget {
         }
     }
 
+    void _showError(BuildContext context, String message) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    Future<void> _rateOnPlayStore(BuildContext context) async {
+        const packageId = 'com.eduardocortesherrera.flip7scoretracker';
+        final marketUri = Uri.parse('market://details?id=$packageId');
+        final webUri = Uri.parse(
+            'https://play.google.com/store/apps/details?id=$packageId',
+        );
+        try {
+            final launched = await launchUrl(marketUri, mode: LaunchMode.externalApplication);
+            if (launched) return;
+        } catch (_) {
+            // Fall through to the web URL below.
+        }
+        try {
+            final launched = await launchUrl(webUri, mode: LaunchMode.externalApplication);
+            if (!launched && context.mounted) {
+                _showError(context, 'Could not open the Play Store.');
+            }
+        } catch (_) {
+            if (context.mounted) _showError(context, 'Could not open the Play Store.');
+        }
+    }
+
+    Future<void> _openBuyMeACoffee(BuildContext context) async {
+        final uri = Uri.parse('https://ko-fi.com/eduardo_cortes_herrera');
+        try {
+            final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+            if (!launched && context.mounted) {
+                _showError(context, 'Could not open the link.');
+            }
+        } catch (_) {
+            if (context.mounted) _showError(context, 'Could not open the link.');
+        }
+    }
+
+    Future<void> _sendFeedback(BuildContext context) async {
+        final uri = Uri(
+            scheme: 'mailto',
+            path: 'echo.congrats636@passinbox.com',
+            query: 'subject=Flip 7 Score Tracker feedback',
+        );
+        try {
+            final launched = await launchUrl(uri);
+            if (!launched && context.mounted) {
+                _showError(context, 'Could not open an email app.');
+            }
+        } catch (_) {
+            if (context.mounted) _showError(context, 'Could not open an email app.');
+        }
+    }
+
+    Future<void> _shareApp(BuildContext context) async {
+        try {
+            await SharePlus.instance.share(
+                ShareParams(
+                    text:
+                        'Track scores for Flip 7 with Flip 7 Score Tracker!',
+                ),
+            );
+        } catch (_) {
+            if (context.mounted) _showError(context, 'Could not open the share sheet.');
+        }
+    }
+
     @override
     Widget build(BuildContext context, WidgetRef ref) {
         final colorScheme = Theme.of(context).colorScheme;
@@ -411,6 +480,38 @@ class _SettingsBody extends ConsumerWidget {
                                     },
                                 ),
                             ],
+                        ],
+                    ),
+                ),
+                const SizedBox(height: 24),
+                Card(
+                    margin: EdgeInsets.zero,
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                        children: [
+                            ListTile(
+                                leading: Icon(Icons.star_outline, color: colorScheme.onSurface),
+                                title: const Text('Rate on Play Store'),
+                                onTap: () => _rateOnPlayStore(context),
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ListTile(
+                                leading: Icon(Icons.share_outlined, color: colorScheme.onSurface),
+                                title: const Text('Share app'),
+                                onTap: () => _shareApp(context),
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ListTile(
+                                leading: Icon(Icons.mail_outline, color: colorScheme.onSurface),
+                                title: const Text('Send feedback'),
+                                onTap: () => _sendFeedback(context),
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ListTile(
+                                leading: Icon(Icons.coffee_outlined, color: colorScheme.onSurface),
+                                title: const Text('Buy me a coffee'),
+                                onTap: () => _openBuyMeACoffee(context),
+                            ),
                         ],
                     ),
                 ),
