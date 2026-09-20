@@ -1,0 +1,4 @@
+enum PlayerSortMode {
+    listOrder,
+    byScore,
+}
