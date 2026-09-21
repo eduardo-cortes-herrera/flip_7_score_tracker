@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../constants/app_constants.dart';
 import '../../domain/entities/theme_preference.dart';
 import 'theme_providers.dart';
 
@@ -7,7 +8,7 @@ class ThemePreferenceNotifier extends AsyncNotifier<ThemePreference> {
     @override
     Future<ThemePreference> build() async {
         final saved = await ref.read(loadThemePreferenceUseCaseProvider).execute();
-        return saved ?? const ThemePreference(themeId: 'classic');
+        return saved ?? const ThemePreference(themeId: defaultThemeId);
     }
 
     Future<void> setThemeId(String themeId) async {

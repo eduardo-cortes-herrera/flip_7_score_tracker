@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../constants/app_constants.dart';
 import '../../../game/domain/entities/game.dart';
 import '../../../game/domain/entities/game_mode.dart';
 import '../../../game/domain/entities/player.dart';
@@ -78,8 +79,8 @@ class _SettingsBody extends ConsumerWidget {
         final notifier = ref.read(activeGameProvider.notifier);
         if (game == null) {
             notifier.startGame(
-                mode: mode ?? GameMode.classic,
-                targetScore: targetScore ?? 200,
+                mode: mode ?? defaultGameMode,
+                targetScore: targetScore ?? defaultTargetScore,
             );
         } else {
             notifier.updateSettings(
@@ -91,7 +92,7 @@ class _SettingsBody extends ConsumerWidget {
     }
 
     Future<void> _pickMode(BuildContext context, WidgetRef ref) async {
-        final current = game?.mode ?? GameMode.classic;
+        final current = game?.mode ?? defaultGameMode;
         final selected = await showModalBottomSheet<GameMode>(
             context: context,
             builder: (context) => SafeArea(
@@ -118,7 +119,7 @@ class _SettingsBody extends ConsumerWidget {
 
     Future<void> _pickTargetScore(BuildContext context, WidgetRef ref) async {
         final controller = TextEditingController(
-            text: (game?.targetScore ?? 200).toString(),
+            text: (game?.targetScore ?? defaultTargetScore).toString(),
         );
         final value = await showDialog<String>(
             context: context,
@@ -233,7 +234,10 @@ class _SettingsBody extends ConsumerWidget {
         final player = Player(id: const Uuid().v4(), name: name.trim());
 
         if (game == null) {
-            await notifier.startGame(mode: GameMode.classic, targetScore: 200);
+            await notifier.startGame(
+                mode: defaultGameMode,
+                targetScore: defaultTargetScore,
+            );
         }
         await notifier.addPlayer(player);
     }
@@ -311,7 +315,6 @@ class _SettingsBody extends ConsumerWidget {
     }
 
     Future<void> _rateOnPlayStore(BuildContext context) async {
-        const packageId = 'com.eduardocortesherrera.flip7scoretracker';
         final marketUri = Uri.parse('market://details?id=$packageId');
         final webUri = Uri.parse(
             'https://play.google.com/store/apps/details?id=$packageId',
@@ -333,7 +336,7 @@ class _SettingsBody extends ConsumerWidget {
     }
 
     Future<void> _openBuyMeACoffee(BuildContext context) async {
-        final uri = Uri.parse('https://ko-fi.com/eduardo_cortes_herrera');
+        final uri = Uri.parse(buyMeACoffeeUrl);
         try {
             final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
             if (!launched && context.mounted) {
@@ -347,8 +350,8 @@ class _SettingsBody extends ConsumerWidget {
     Future<void> _sendFeedback(BuildContext context) async {
         final uri = Uri(
             scheme: 'mailto',
-            path: 'echo.congrats636@passinbox.com',
-            query: 'subject=Flip 7 Score Tracker feedback',
+            path: feedbackEmail,
+            query: 'subject=$appName feedback',
         );
         try {
             final launched = await launchUrl(uri);
@@ -364,8 +367,7 @@ class _SettingsBody extends ConsumerWidget {
         try {
             await SharePlus.instance.share(
                 ShareParams(
-                    text:
-                        'Track scores for Flip 7 with Flip 7 Score Tracker!',
+                    text: 'Track scores for Flip 7 with $appName!',
                 ),
             );
         } catch (_) {
@@ -391,14 +393,14 @@ class _SettingsBody extends ConsumerWidget {
                             _SettingsTile(
                                 icon: Icons.style_outlined,
                                 label: 'Game mode',
-                                value: _modeLabel(game?.mode ?? GameMode.classic),
+                                value: _modeLabel(game?.mode ?? defaultGameMode),
                                 onTap: () => _pickMode(context, ref),
                             ),
                             const Divider(height: 1, indent: 56),
                             _SettingsTile(
                                 icon: Icons.flag_outlined,
                                 label: 'Target score',
-                                value: '${game?.targetScore ?? 200}',
+                                value: '${game?.targetScore ?? defaultTargetScore}',
                                 onTap: () => _pickTargetScore(context, ref),
                             ),
                         ],

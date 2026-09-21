@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../constants/app_constants.dart';
 import '../../../calculator/presentation/widgets/calculator_toggle_tile.dart';
 import '../../../game/domain/entities/player.dart';
 import '../../../game/presentation/providers/active_game_notifier.dart';
@@ -69,7 +70,7 @@ class _ThemeSettingsBody extends ConsumerWidget {
                     totalScore: previewPlayer != null
                         ? game!.totalScoreForPlayer(previewPlayer.id)
                         : 94,
-                    targetScore: game?.targetScore ?? 200,
+                    targetScore: game?.targetScore ?? defaultTargetScore,
                     roundsPlayed: previewPlayer != null ? game!.rounds.length : 3,
                     roundScores: previewPlayer != null
                         ? [for (final round in game!.rounds) round.scoreForPlayer(previewPlayer.id)]
