@@ -5,7 +5,7 @@ import '../features/game/domain/entities/game_mode.dart';
 /// UI layer.
 
 const String appName = 'Flip 7 Score Tracker';
-const String packageId = 'com.eduardocortesherrera.flip7scoretracker';
+const String packageId = 'com.eduardocortes.flip7scoretracker';
 const String feedbackEmail = 'echo.congrats636@passinbox.com';
 const String buyMeACoffeeUrl = 'https://ko-fi.com/eduardo_cortes_herrera';
 
